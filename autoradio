@@ -1,0 +1,74 @@
+#!/bin/bash
+# My car stereo has an USB port so it can plat mp3s from an USBstick
+# Random play function operates only on a single directory. So all
+# mp3s must e placed in a single directory. A seperate textfile wil be
+# generated for each mp3 cd processed.
+# Script to copy MP3 cd to USB stick, only .mp3 files in a single directory
+# Jos Kaats Dec 2015
+#set -x
+# Todo:
+# lastcdnr ophalen (zie banshee_controle)
+# random nr ophalen
+# later uitbreiden: noarg is een random cd erbij, anders aantal cd's opgeven
+
+# Validate argument 
+if [ $# -ne 1 ] # ONE argument; not more and not zero
+then
+  echo usage: "$(basename $0) <MP3-CD-ID>" 
+  echo where MP3-CD-ID consists of one to four digits
+  exit 1
+fi 
+
+case $1 in # Argument must be numeric, without sign
+  ''|*[!0-9]*) 
+  echo usage: "$(basename $0) <MP3-CD-ID>" 
+  echo where MP3-CD-ID consists of one to four digits
+  exit 1 ;;
+esac
+
+if [ ${#1} -gt 4 ] # Max 4 digits
+then
+  echo usage: "$(basename $0) <MP3-CD-ID>" 
+  echo where MP3-CD-ID consists of one to four digits
+  exit 1
+fi 
+
+# Initialize
+PARAMETER=$1
+if [ ${#1} -eq 3 ]
+then
+  PARAMETER="0$1"
+fi
+if [ ${#1} -eq 2 ]
+then
+  PARAMETER="00$1"
+fi
+if [ ${#1} -eq 1 ]
+then
+  PARAMETER="000$1"
+fi
+LETTERNUMMER=${PARAMETER:0:2}
+LETTERSTRING="LMNOPQRSTUVWXYZABCDEFGHIJK"
+CDLETTER=${LETTERSTRING:$LETTERNUMMER:1}
+CDID=$CDLETTER${PARAMETER:2:2}
+MP3PATH=/media/wamoje/MyDrive/MP3_VO/$CDLETTER/$CDID
+USBPATH=/media/wamoje/0F7B-126A/MP3
+
+# Check to see if MP3 HD is mounted
+if [ ! -d $MP3PATH ] 
+then
+  echo "MP3 harddisk is not connected or subdir does not exist" >&2
+  exit 1
+fi
+
+# Check to see if USB is mounted
+if [ ! -d $USBPATH ] 
+then
+  echo "USBstick is not connected" >&2
+  exit 1
+fi
+
+echo Copying MP3_VO$CDID...
+find $MP3PATH -type f -iname "*.mp3" -exec cp -v {} $USBPATH \;
+find $MP3PATH -type f -iname "*.mp3" >$USBPATH/Index/$CDID.txt
+echo Done...

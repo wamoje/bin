@@ -1,0 +1,9 @@
+TMPFILE=$( mktemp )
+cd /media/wamoje/803E-06E4/Banshee/Gov*
+ls >$TMPFILE
+while read REGEL
+do
+#echo  mv "$REGEL" "${REGEL:7}" 
+mv "$REGEL" "Gov\'t Mule - $REGEL"
+done <$TMPFILE
+rm $TMPFILE

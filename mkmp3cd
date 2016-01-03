@@ -1,0 +1,72 @@
+#!/bin/bash
+# Script to create index listing of MP3 CD - Jos Kaats 03/2014
+# Also create a copy in MP3_VO/x/x99
+
+# Check to see if MP3 HD is mounted
+if [ ! -d /media/wamoje/MyDrive ] 
+then
+  echo "MP3 harddisk is not connected" >&2
+  exit 1
+fi
+
+# Argument given?
+if [ $# -ne 1 ]
+then
+  echo usage: "$(basename $0) <MP3-CD-ID>" 
+  echo where MP3-CD-ID consists of one capital letter and two digits
+  exit 1
+fi 
+
+# Initialize
+CDLETTER=${1:0:1}
+MP3PATH=/media/wamoje/MyDrive/MP3
+CDPATH=/media/wamoje/MP3_VO$1
+COPYPATH=/media/wamoje/MyDrive/MP3_VO/${CDLETTER}/$1
+INDEXPATH=/home/wamoje/Dropbox/Public/Index
+FOUT="N"
+
+if [ ! -d $CDPATH ]
+then
+  echo "MP3-cd not mounted ($1)" >&2
+  exit 1
+fi
+
+if [ -f $INDEXPATH/MP3_VO$1.txt ]
+then
+  echo txt file for $1 allready exists >&2
+  exit 1
+fi
+
+echo "Creating index listing for MP3_VO$1"
+ls -alhR $CDPATH > $INDEXPATH/MP3_VO$1.txt
+
+mkdir -p $COPYPATH
+cd $CDPATH
+TMPFILE=$( mktemp )
+ls >$TMPFILE
+cd -
+while read REGEL
+do
+  echo "Moving $REGEL"
+  mv "$MP3PATH/$REGEL" $COPYPATH
+  RC=$?
+  if [ $RC -ne 0 ]
+  then
+    FOUT="Y"
+    echo "Fout: mv \"$MP3PATH/$REGEL\" $COPYPATH geeft RC=$RC" >&2
+# Indien geen move doordat dirnaam ingekort is (joliet), dan hier opvangen?
+  fi
+done <$TMPFILE
+rm $TMPFILE
+ls -alR $COPYPATH 
+
+echo "===========DONE============"
+if [ $FOUT = "Y" ]
+then
+  echo '*********************************' >&2
+  echo '* ===>> Errors occured!!! <<=== *' >&2
+  echo '*********************************' >&2
+fi
+echo "Don't forget to import $COPYPATH in Banshee..."
+exit 0
+
