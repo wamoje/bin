@@ -1,0 +1,14 @@
+#!/bin/bash
+#  Zoek 1 tot 5 argumenten in textfiles in MP3/Index en in mp3 bestandsnamen in MP3
+case $# in 
+ 1) echo "Index:"
+   grep -i $1 /home/wamoje/Dropbox/Public/Index/MP3_V*/*.txt ;;
+ 2) echo "Index:"
+   grep -i $1 /home/wamoje/Dropbox/Public/Index/MP3_V*/*.txt | grep -i $2 ;;
+ 3) echo "Index:"
+   grep -i $1 /home/wamoje/Dropbox/Public/Index/MP3_V*/*.txt | grep -i $2 | grep -i $3 ;;
+ 4) echo "Index:"
+   grep -i $1 /home/wamoje/Dropbox/Public/Index/MP3_V*/*.txt | grep -i $2 | grep -i $3 | grep -i $4 ;;
+ *) echo "1 tot 4 variabelen mee geven" 
+   exit 1 ;;
+esac

@@ -1,0 +1,1 @@
+find ~/shares -type d -iname "*${1}*"
