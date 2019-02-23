@@ -18,6 +18,11 @@ case $# in
    echo "MP3:"
    ls -R $_MP3DIR | grep -i "$1" | grep -i "$2" | grep -i "$3"
    ;;
- *) echo "1 tot 3 variabelen mee geven" 
+ 4) echo "Index:"
+   grep -i "$1" $_INDEXDIR/*.txt | grep -i "$2" | grep -i "$3" | grep -i "$4"
+   echo "MP3:"
+   ls -R $_MP3DIR | grep -i "$1" | grep -i "$2" | grep -i "$3" | grep -i "$4"
+   ;;
+ *) echo "1 tot 4 variabelen mee geven" 
    exit 1 ;;
 esac
